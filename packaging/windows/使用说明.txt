@@ -1,0 +1,32 @@
+我的工具箱 · Windows 便携版
+
+适用：Windows 10 / 11，64 位（x64）。无需安装 Python、uv 或依赖。
+
+1. 把 ZIP 完整解压到你有写入权限的文件夹，例如“文档”或 D 盘。
+   不要直接在压缩包内运行，也不要只复制启动文件。
+2. 双击“启动工具箱.cmd”，浏览器会打开工具箱。
+   默认地址：http://127.0.0.1:8765
+3. 用完后双击“停止工具箱.cmd”。关闭浏览器不会停止后台服务。
+
+第一次打开为空库。日常收藏、搜索和导出不需要联网。
+首次解压后请保留 runtime 文件夹，其中包含运行所需的全部依赖。
+
+数据和备份
+- 收藏及私人笔记保存在本目录的 data/library.sqlite3。
+- 在界面“数据与备份”中导出完整 JSON，可在新版本中导入。
+- 升级：先备份并停止旧版；把新版解压到新目录，再复制旧版的整个
+  data 文件夹到新版，或在新版界面导入 JSON。确认数据后再处理旧目录。
+- 搬动整个文件夹或复制 data 文件夹之前，请先停止工具箱。
+- 分享时只发送界面导出的 HTML 或 Markdown。完整备份和 data 含私人信息。
+
+常见问题
+- 端口被其他工具箱占用：先停止另一份工具箱，再启动这一份。
+- 页面没打开：浏览器访问上面的本机地址；启动失败会保留错误窗口。
+- 不要放进 Program Files 等需要管理员权限的目录，无需以管理员身份运行。
+- 当前发行版未进行代码签名，Windows 可能显示发布者未知提示。
+  请核对下载来源与 Release 提供的 SHA256，不要关闭系统安全防护。
+- 运行日志在 .runtime/server-error.log，反馈时请勿附带私人数据库。
+
+项目与更新：https://github.com/siminjiangjsg/personal-resource-shelf
+下载发布版：https://github.com/siminjiangjsg/personal-resource-shelf/releases
+许可证：MIT；随包运行时与依赖的许可见 LICENSE、THIRD_PARTY_NOTICES.txt 和 licenses。

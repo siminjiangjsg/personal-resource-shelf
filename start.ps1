@@ -23,16 +23,29 @@ if ($null -ne $existing) {
     exit 0
 }
 
-$pythonPath = Join-Path $projectRoot '.venv\Scripts\python.exe'
-if (-not (Test-Path -LiteralPath $pythonPath)) {
-    $pythonCommand = Get-Command python -ErrorAction SilentlyContinue
-    if ($null -eq $pythonCommand) { throw 'Python 3.13+ is required. Install Python or run uv sync first.' }
-    $pythonPath = $pythonCommand.Source
+$env:TOOLBOX_DATA_DIR = Split-Path -Parent $expectedDatabase
+$launch = @{
+    FilePath = Join-Path $projectRoot 'runtime\toolbox-server.exe'
+    WorkingDirectory = $projectRoot
+    WindowStyle = 'Hidden'
+    PassThru = $true
+    RedirectStandardOutput = Join-Path $runtimePath 'server-output.log'
+    RedirectStandardError = Join-Path $runtimePath 'server-error.log'
 }
-& $pythonPath -c "import sys, fastapi, pydantic, uvicorn; assert sys.version_info >= (3, 13)"
-if ($LASTEXITCODE -ne 0) { throw 'Dependencies are missing. Run uv sync in this folder, then start again.' }
+if (-not (Test-Path -LiteralPath $launch.FilePath)) {
+    $pythonPath = Join-Path $projectRoot '.venv\Scripts\python.exe'
+    if (-not (Test-Path -LiteralPath $pythonPath)) {
+        $pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+        if ($null -eq $pythonCommand) { throw 'Python 3.13+ is required. Install Python or run uv sync first.' }
+        $pythonPath = $pythonCommand.Source
+    }
+    & $pythonPath -c "import sys, fastapi, pydantic, uvicorn; assert sys.version_info >= (3, 13)"
+    if ($LASTEXITCODE -ne 0) { throw 'Dependencies are missing. Run uv sync in this folder, then start again.' }
+    $launch.FilePath = $pythonPath
+    $launch.ArgumentList = @('-m', 'toolbox')
+}
 
-$serverProcess = Start-Process -FilePath $pythonPath -ArgumentList @('-m', 'toolbox') -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $runtimePath 'server-output.log') -RedirectStandardError (Join-Path $runtimePath 'server-error.log')
+$serverProcess = Start-Process @launch
 $processRecord = @{
     pid = $serverProcess.Id
     start_ticks = $serverProcess.StartTime.ToUniversalTime().Ticks.ToString()

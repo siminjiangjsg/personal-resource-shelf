@@ -14,7 +14,19 @@ Local URL library with SQLite persistence, search, categories, private notes, an
 - 完整 JSON 备份与合并恢复；导入前自动备份当前数据。
 - 跟随系统明暗主题，支持窄窗口布局。
 
-## 快速开始
+## Windows 便携版（无需安装 Python）
+
+在 [GitHub Releases](https://github.com/siminjiangjsg/personal-resource-shelf/releases/latest) 下载 `personal-resource-shelf-v1.0.0-windows-x64.zip`，适用于 Windows 10 / 11 x64。
+
+1. **完整解压**到有写入权限的目录。
+2. 双击 **启动工具箱.cmd**，浏览器自动打开。
+3. 用完后双击 **停止工具箱.cmd**；关闭浏览器不会停止后台服务。
+
+包内已包含 Python 和依赖，无需安装 Git、uv 或 Python。请保留整个 `runtime` 文件夹。首次启动为空库，数据保存在解压目录的 `data/`。升级时先备份并停止旧版，再将整个 `data/` 复制到新版本目录，或在新版导入 JSON 备份。
+
+发布包尚未进行代码签名；可用 Release 附带的 SHA256 文件核对下载完整性。下载时选择上述 ZIP，GitHub 自动生成的 **Source code** 是需要自行安装环境的源码。
+
+## 从源码部署
 
 ### 1. 获取代码
 
@@ -130,6 +142,17 @@ uv run --frozen basedpyright
 ```
 
 测试使用隔离临时数据库。GitHub Actions 在 Windows 和 Linux 上执行这些检查；首次发布前另外执行过保存、重启读取、搜索分类、分享下载和备份恢复的真实浏览器验证。
+
+### 构建 Windows 便携包
+
+维护者在 Windows x64 上安装 uv 和 PowerShell 7 后运行：
+
+```powershell
+pwsh -File scripts/build-windows.ps1
+pwsh -File scripts/test-windows-package.ps1 -Archive dist/personal-resource-shelf-v1.0.0-windows-x64.zip
+```
+
+构建使用独立的 `.runtime/windows-build-venv`、Python 3.13 和锁定的 PyInstaller，不改变开发环境；输出 ZIP 和 SHA256 到 `dist/`，已有输出不会被覆盖。重复构建可传 `-OutputDirectory dist/new-build`。压缩包仅包含运行时、网页资源、启动入口和许可文件，不包含开发者的收藏。验证脚本从 ZIP 解压到含空格和中文的临时路径，移除 PATH 中的 Python/uv，检查内置解释器、首次空库、保存重启、选择性分享及端口冲突。
 
 ```text
 toolbox/       本地接口、数据模型、SQLite 存储、分享导出
