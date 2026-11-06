@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="本地保存工具与资料链接，分类查找，选择性导出分享。">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="color-scheme" content="light dark">
+  <title>我的工具箱 · 个人资源库</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要内容</a>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="side-content">
+      <div class="brand">我的工具箱<p>好东西，先收下。</p></div>
+      <nav class="navigation" aria-label="资源导航">
+        <button class="nav-button" data-route="all" aria-current="page"><span>全部资源</span><span id="all-count">0</span></button>
+        <button class="nav-button" data-route="inbox"><span>待整理</span><span id="inbox-count">0</span></button>
+        <button class="nav-button" data-route="collections">分享清单</button>
+        <button class="nav-button" data-route="archive">归档资源</button>
+        <button class="nav-button" data-route="backup">数据与备份</button>
+      </nav>
+      <p class="side-caption">本地版 v1.0<br>私人收藏保存在这台电脑</p>
+    </div>
+  </aside>
+  <main id="main">
+    <div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div>
+    <section id="library-view" class="stack" aria-labelledby="library-title">
+      <div class="between"><h1 id="library-title">全部资源</h1><button id="new-resource" class="btn">详细添加</button></div>
+      <form id="capture-form" class="capture">
+        <label for="capture-urls">粘贴链接，先收下</label>
+        <div class="capture-row">
+          <textarea id="capture-urls" class="input" rows="2" placeholder="https://…（支持多条链接，每行一个）" required aria-describedby="capture-hint"></textarea>
+          <button id="capture-button" class="btn primary" type="submit">收下链接</button>
+        </div>
+        <p id="capture-hint" class="small muted">标题先取自链接，可稍后编辑；重复链接会提示并保留原记录。</p>
+      </form>
+      <div class="filters">
+        <label class="field" for="search"><span class="small muted">查找资源</span><input id="search" class="input" type="search" placeholder="名称、链接、用途或标签"></label>
+        <label class="field" for="kind-filter"><span class="small muted">资源类型</span><select id="kind-filter" class="input"><option value="">全部类型</option></select></label>
+        <label class="field" for="category-filter"><span class="small muted">主题分类</span><select id="category-filter" class="input"><option value="">全部分类</option></select></label>
+        <label class="field" for="status-filter"><span class="small muted">使用状态</span><select id="status-filter" class="input"><option value="">全部状态</option><option>待看</option><option>已看</option><option>已用</option></select></label>
+      </div>
+      <div class="between"><span id="result-count" class="small muted" role="status"></span><button id="reset-filters" class="text-btn">清除筛选</button></div>
+      <div class="selection-tray between">
+        <span id="selection-count" role="status">已选 0 项</span>
+        <div class="cluster"><button id="select-results" class="text-btn">选择筛选结果</button><button id="clear-selection" class="text-btn">清空</button><button id="create-share" class="btn primary" disabled>整理分享清单</button></div>
+      </div>
+      <div id="resource-list" aria-label="资源列表"></div>
+      <button id="load-more" class="btn" hidden>显示更多</button>
+    </section>
+    <section id="collections-view" class="stack" aria-labelledby="collections-title" hidden>
+      <div class="between"><h1 id="collections-title">分享清单</h1><button class="btn" data-route="all">去选择资源</button></div>
+      <p class="muted">按需整理清单，各自保留推荐语。</p>
+      <button id="continue-share" class="btn" hidden>继续编辑当前清单</button>
+      <div id="collection-list"></div>
+    </section>
+    <section id="share-view" class="stack" aria-labelledby="share-title" hidden>
+      <div class="between"><h1 id="share-title">整理分享清单</h1><span id="share-status" class="badge">尚未保存</span></div>
+      <label class="field" for="collection-title">清单标题<input id="collection-title" class="input" maxlength="160" required placeholder="例如：给同事的科研工具清单"></label>
+      <div class="share-settings">
+        <div class="stack"><div class="between"><h2>这次分享的内容</h2><span id="share-count" class="small muted"></span></div><div id="share-items"></div></div>
+        <aside class="note stack" aria-label="分享设置">
+          <h2>对方能看到</h2><p class="small muted">资源名称、原始链接<br>本清单的推荐语</p>
+          <label class="check"><input id="share-tags" type="checkbox">展示主题标签</label>
+          <p class="small muted">私人笔记与使用状态留在自己的库里。</p>
+          <button id="append-selected" class="btn" type="button">追加已选资源</button>
+        </aside>
+      </div>
+      <div class="between"><button class="text-btn" data-route="collections">返回清单列表</button><button id="save-share" class="btn primary">保存清单</button></div>
+      <div id="share-exports" class="export-actions stack" hidden>
+        <div class="cluster"><a id="preview-share" class="btn" target="_blank" rel="noopener">本机预览</a><a id="download-html" class="btn primary" download>下载分享页</a><a id="download-md" class="btn" download>下载 Markdown</a><button id="copy-md" class="btn">复制 Markdown</button></div>
+        <p class="small muted">下载文件后即可转发。<br>本机预览仅供自己查看。</p>
+      </div>
+    </section>
+    <section id="backup-view" class="stack" aria-labelledby="backup-title" hidden>
+      <h1 id="backup-title">数据与备份</h1>
+      <div class="note stack"><h2>数据保存在本机</h2><p>收藏保存在本机，重启后继续使用。</p><p id="data-path" class="path"></p></div>
+      <div class="stack"><h2>导出完整备份</h2><p class="muted">包含全部收藏、私人笔记和分享清单。用于迁移或恢复。</p><div><a class="btn primary" href="/api/backup" download>下载完整备份</a></div></div>
+      <hr class="divider">
+      <form id="restore-form" class="stack"><h2>从备份恢复</h2><label class="field" for="restore-file">选择工具箱导出的 JSON 文件<input id="restore-file" class="file-input" type="file" accept=".json,application/json" required></label><p class="small muted">按链接合并，已有条目保留现状。导入前会在 data/backups 中保存一份当前备份。</p><div><button id="restore-button" class="btn" type="submit">合并导入备份</button></div></form>
+    </section>
+    <noscript><p>此工具需要浏览器启用 JavaScript。</p></noscript>
+  </main>
+</div>
+<dialog id="resource-dialog" class="editor" aria-labelledby="editor-title">
+  <form id="resource-form" class="stack">
+    <div class="between"><h2 id="editor-title">编辑资源</h2><button id="close-editor" class="text-btn" type="button">关闭</button></div>
+    <div class="form-grid">
+      <label class="field span-all" for="edit-url">原始链接<input id="edit-url" name="url" class="input" type="url" required maxlength="8192"></label>
+      <label class="field span-all" for="edit-title">名称<input id="edit-title" name="title" class="input" maxlength="300" placeholder="可留空，使用链接名称"></label>
+      <label class="field" for="edit-kind">资源类型<select id="edit-kind" name="kind" class="input"></select></label>
+      <label class="field" for="edit-category">主题分类<input id="edit-category" name="category" class="input" list="category-options" maxlength="80" placeholder="例如：科研、开发、阅读"></label>
+      <datalist id="category-options"></datalist>
+      <label class="field" for="edit-tags">标签<input id="edit-tags" name="tags" class="input" placeholder="用逗号分隔，例如：写作, 自动化"></label>
+      <label class="field" for="edit-status">使用状态<select id="edit-status" name="status" class="input"><option>待看</option><option>已看</option><option>已用</option></select></label>
+      <label class="field span-all" for="edit-description">用途简述<textarea id="edit-description" name="description" class="input" rows="2" maxlength="2000"></textarea></label>
+      <label class="field span-all" for="edit-note">私人笔记 · 仅自己可见<textarea id="edit-note" name="note" class="input" rows="3" maxlength="20000"></textarea></label>
+      <label class="check span-all"><input id="edit-organized" type="checkbox">已整理，从待整理列表移出</label>
+    </div>
+    <p id="editor-feedback" class="error" role="alert" hidden></p>
+    <div class="between"><button id="archive-resource" class="text-btn" type="button">归档资源</button><div class="cluster"><button id="cancel-editor" class="btn" type="button">取消</button><button id="save-resource" class="btn primary" type="submit">保存资源</button></div></div>
+  </form>
+</dialog>
+</body>
+</html>
